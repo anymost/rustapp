@@ -2,6 +2,10 @@
  * 
  * 闭包不需要定义参数类型，如果两次调用闭包参数类型不同会报错
  * 闭包能够捕获当前环境的变量，函数则不能
+ * 闭包三种不同的捕获环境变量的方式：
+ * 1 FnOnce 获取所有权
+ * 2 FnMut 获取可变借用
+ * 3 Fn 获取不可变借用
  */
 use std::{thread, time::Duration, collections::hash_map::HashMap};
 
@@ -56,6 +60,24 @@ fn capture_value() {
     println!("{}", is_equal(z));
 }
 
+fn test_fn_once() {
+    let x = vec![1, 2, 3, 4, 5];
+    let fn_onece_closure = move |y| y == x;
+    let y = vec![1, 2, 3, 4, 5];
+    let is_equal = fn_onece_closure(y);
+    println!("{}", is_equal);
+    // println!("{:?}", x);
+}
+
+fn test_fn_mut() {
+    let mut x = vec![1, 2, 3, 4, 5];
+    let mut func = || {
+        x[1] = 3
+    };
+    func();
+    println!("{:?}", x);
+}
+
 fn main() {
     // let expensive_calculate = |x| {
     //     thread::sleep(Duration::from_secs(2));
@@ -66,6 +88,7 @@ fn main() {
     // println!("{}", val);
     // val = cacher.value(2);
     // println!("{}", val);
-    capture_value();
-    
+    // capture_value();
+    test_fn_once();
+    test_fn_mut();
 }
