@@ -1,110 +1,50 @@
-use std::collections::hash_map::HashMap;
+// box允许将一个值放在堆上，然后在栈上创建一个指针指向它。
+// 当离开box的作用域时，box以及它指向堆上的数据会立即释放
+// 适用场景
+// 1 适用于大小可变或未知的数据
+// 2 有大量数据，希望在不拷贝的情况下转移所有权
+// 3 有一个值关注它是否实现了某个trait，而不关注类型
 
-/**
- * 迭代器是惰性的，不消费不会有任何损耗
- * iter() 不可变引用
- * into_iter() 所有权
- * iter_mut() 可变引用
- * 消费适配器用于消费迭代器,一些消费适配器会获取迭代器的所有权
- */
+//enum List {
+//    Cons(i32, List),
+//    Nil
+//}
 
-
-fn iterate_array() {
-    let array: [i32; 6] = [1, 2, 3, 4, 5, 6];
-    for item in array.iter() {
-        println!("{}", item);
-    }
+#[derive(Debug)]
+enum List {
+    Cons(i32, Box<List>),
+    Nil
 }
 
-fn iterate_vector() {
-    let vector = vec![1, 2, 3, 4, 5, 6];
-    for item in vector.iter() {
-        println!("{}", item);
-    }
+use List::{Cons, Nil};
+
+fn base_box() {
+    let a = Box::new(1);
+    println!("{}", a);
 }
 
-fn iterate_map() {
-    let mut map: HashMap<i32, i32> = HashMap::new();
-    map.insert(1, 1);
-    map.insert(2, 2);
-    map.insert(3, 3);
-    map.insert(4, 4);
-    map.insert(5, 5);
-    map.insert(6, 6);
+//fn recursive_box() {
+//    let b = Cons(20, Cons(30, Cons(40, Cons(50, Cons(60, Nil)))));
+//}
 
-    for (key, value) in map.iter() {
-        println!("{} {}", key, value);
-    }
-}
-
-fn consume_iterator() {
-    let vector = vec![1, 2, 3, 4, 5];
-    let mut it = vector.iter();
-    assert_eq!(it.next(), Some(&1));
-    assert_eq!(it.next(), Some(&2));
-    assert_eq!(it.next(), Some(&3));
-    assert_eq!(it.next(), Some(&4));
-    assert_eq!(it.next(), Some(&5));
-    assert_eq!(it.next(), None);
-}
-
-// 消费适配器
-fn consume_adapter() {
-    let vector = vec![1, 2, 3, 4, 5, 6];
-    let it = vector.iter();
-    // sum 会获取迭代器所有权
-    let sum: i32 = it.sum();
-    println!("{}", sum);
-}
-
-// 迭代器适配器
-fn iterate_adapter() {
-    let vector = vec![1, 2, 3, 4, 5, 6];
-    let new_vector: Vec<i32> = vector.iter().map(|x| x + 1).collect();
-    println!("{:?}", new_vector);
-}
-
-fn test_iter() {
-    iterate_array();
-    iterate_vector();
-    iterate_map();
-    consume_adapter();
-    iterate_adapter();
-    let flag = &&4;
-    let filter_and_plus_one = |vector: Vec<i32>| vector.iter().filter(|x| x < flag).map(|x| x + 1).collect();
-    let new_vec: Vec<i32> = filter_and_plus_one(vec![1, 2, 3, 4, 5]);
-    println!("{:?}", new_vec);
-}
-
-struct Counter {
-    count: i32
-}
-
-impl Counter {
-    fn new() -> Counter {
-        Counter {
-            count: 0
-        }
-    }
-}
-
-impl Iterator for Counter {
-    type Item = i32;
-
-    fn next(&mut self) -> Option<Self::Item> {
-        if self.count < 10 {
-            self.count += 1;
-            Some(self.count)
-        } else {
-            None
-        }
-    }
+fn recursive_box() {
+    let b = Cons(10,
+        Box::new(Cons(
+                     20,
+            Box::new(Cons(
+                        30,
+                Box::new(Cons(
+                        40,
+                    Box::new(Cons(
+                        50,
+                        Box::new(Nil)))))))
+        )
+        )
+    );
+    println!("{:?}", b);
 }
 
 fn main() {
-    let mut counter = Counter::new();
-    assert_eq!(counter.next(), Some(1));
-
-    let new_counter = Counter::new().map(|v| v + 1).collect();
-    println!("{}", new_counter);
+    // ase_box();
+    recursive_box();
 }
