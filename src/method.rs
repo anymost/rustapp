@@ -4,7 +4,6 @@ struct Rectangle {
 }
 
 impl Rectangle {
-    // 关联函数
     fn new(width: u32, height: u32) -> Rectangle {
         Rectangle{
             width,
