@@ -1,7 +1,5 @@
 // 运行时：指二进制文件中由语言本身提供的代码
 // 使用join,阻塞主线程，等待子线程执行完成
-
-
 use std::thread;
 use std::time::Duration;
 
