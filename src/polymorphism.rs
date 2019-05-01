@@ -1,9 +1,14 @@
 /**
+trait对象指定义某些类型的指针&或Box，然后指定特定的trait，例如 Box<Draw>，运行时多态
 这里有两种不同的实现下面Screen struct的方式
-ScreenOne: 允许vec中变量有不同的类型，只要他们都实现了Draw trait
-ScreenTwo: vec中的变量必须是同一类型，这一类型需要实现Draw trait
+ScreenOne: 允许vec中变量有不同的类型，只要他们都实现了Draw trait，运行时多态
+ScreenTwo: vec中的变量必须是同一类型，这一类型需要实现Draw trait，编译时多态
 
 这里的多态依然使用了鸭式辩形
+
+trait对象中的trait需要是安全的，具体是指：
+1 返回值不能为类型不能为Self
+2 参数中不包含泛型
 */
 pub trait Draw{
     fn draw(&self);
@@ -70,4 +75,16 @@ fn main() {
         ]
     };
     screen.run();
+    let screen = ScreenTwo{
+        components: vec![
+            Button{
+                width: 20,
+                height: 20
+            },
+            Button{
+                width: 20,
+                height: 20
+            }
+        ]
+    };
 }
